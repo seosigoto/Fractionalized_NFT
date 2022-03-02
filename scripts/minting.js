@@ -45,7 +45,7 @@ const mintNFT = async (tokenURI) => {
 }
 
 const mintFT = async (PUBLIC_KEY, amount) => {
-    const transaction = await ftContract.grandRole(stkaddress);
+    const transaction = await ftContract.grantRole(stkaddress);
     const tx = await transaction.wait();
     console.log(`grant Role to stkcontract`)
 }

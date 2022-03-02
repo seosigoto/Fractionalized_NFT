@@ -7,7 +7,6 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 
 contract MyToken is ERC721, Ownable {
     using Counters for Counters.Counter;
-
     Counters.Counter private _tokenIdCounter;
 
     constructor() ERC721("testToken", "TTK") {}

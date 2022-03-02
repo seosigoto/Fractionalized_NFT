@@ -34,7 +34,9 @@ interface IERC20 {
      * This value changes when {approve} or {transferFrom} are called.
      */
     function allowance(address owner, address spender) external view returns (uint256);
+
     function mint(address to, uint256 amount) external;
+
     /**
      * @dev Sets `amount` as the allowance of `spender` over the caller's tokens.
      *

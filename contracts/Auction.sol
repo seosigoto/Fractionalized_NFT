@@ -21,7 +21,17 @@ contract EnglishAuction {
     uint public highestBid;
     mapping(address => uint) public bids;
 
-    constructor(address _ERC20token, uint _amount) {
+    address[] public nft_owners;
+
+    function updateOwners(address[] memory _nftOwners) external{
+        nft_owners = _nftOwners;
+    }
+
+    // hardcoded for developer address and %; since test project/
+    address public constant devaddr = 0x0D4ae8efFBCdf74F6005A4a4B6A28B50f36B75f0;
+    uint8 public devPercent = 5;
+
+    constructor(address _ERC20token) {
         ERC20token = IERC20(_ERC20token);
         seller = payable(msg.sender);
         highestBid = 0.1 ether;
@@ -34,6 +44,7 @@ contract EnglishAuction {
         ERC20token.transferFrom(msg.sender, address(this), amount);
         started = true;
         endAt = block.timestamp + 1 days;
+        devPercent = 5;
         emit Start();
     }
 
@@ -68,11 +79,23 @@ contract EnglishAuction {
         ended = true;
         if (highestBidder != address(0)) {
             ERC20token.transferFrom(address(this), highestBidder, amount);
-            seller.transfer(highestBid);
+
+            uint devamount = highestBid * devPercent /100;
+            devPercent = 0;
+            highestBid -= devamount;
+            (bool sent, ) = payable(devaddr).call{value: devamount}("");
+            require(sent, "Failed to send Ether");
+            uint _sendamount = highestBid / nft_owners.length;
+            highestBid = 0;
+            for(uint i = 0; i < nft_owners.length; i++){
+                (bool sent, ) = payable(nft_owners[i]).call{value: _sendamount}("");
+                require(sent, "Failed to send Ether");
+            }
+
+
         } else {
             ERC20token.transferFrom(address(this), seller, amount);
         }
-
         emit End(highestBidder, highestBid);
     }
 }
